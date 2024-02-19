@@ -40,4 +40,9 @@ const regNewUser = (data: string, ws: WebSocket, players: Players): void => {
   });
 
   ws.send(response);
+  console.log(`Registration result: message send to client ${response}`);
 };
+
+// const createRoom = () => {
+//   //
+// };
