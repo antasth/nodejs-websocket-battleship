@@ -3,3 +3,7 @@ export interface IPlayer {
   login: string;
   password: string;
 }
+
+export interface IRoom {
+  indexRoom: number;
+}
