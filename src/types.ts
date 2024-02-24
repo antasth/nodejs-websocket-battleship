@@ -6,7 +6,8 @@ export interface IPlayer {
 }
 
 export interface IRoom {
-  indexRoom: number;
+  player1Id: string;
+  player2Id?: string;
 }
 
 export interface IConnections {

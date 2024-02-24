@@ -1,14 +1,10 @@
 import { IRoom } from './types';
 
 export class Rooms {
-  private roomsList: IRoom[] = [];
+  private roomsList: Record<string, IRoom> = {};
 
-  addRoom(room: IRoom) {
-    this.roomsList.push(room);
-  }
-
-  getRoom(roomNumber: number) {
-    return this.roomsList.find((room) => room.indexRoom === roomNumber);
+  createRoom(roomId: string, uuid: string) {
+    this.roomsList[roomId] = { player1Id: uuid };
   }
 
   getRoomsList() {

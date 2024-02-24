@@ -1,4 +1,6 @@
+import crypto from 'crypto';
 import { Players } from './players';
+import { Rooms } from './rooms';
 import { IConnections } from './types';
 
 export const requestHandler = (
@@ -6,6 +8,7 @@ export const requestHandler = (
   connections: IConnections,
   uuid: string,
   players: Players,
+  rooms: Rooms,
 ) => {
   const message = JSON.parse(data);
   switch (message.type) {
@@ -13,21 +16,48 @@ export const requestHandler = (
       regNewUser(message.data, uuid, players, connections);
       break;
 
-    // case 'create_room':
-    //   console.log('room creation');
-    //   createRoom(connection, rooms, players);
-    //   break;
+    case 'create_room':
+      console.log('room creation');
+      createRoom(uuid, connections, rooms, players);
+      break;
 
     default:
       break;
   }
 };
 
-// const createRoom = (  connections: IConnections,
-//   , rooms,   players: Players,
-//   ) => {
+const createRoom = (
+  uuid: string,
+  connections: IConnections,
+  rooms: Rooms,
+  players: Players,
+) => {
+  const roomId = crypto.randomBytes(16).toString('hex');
 
-// }
+  rooms.createRoom(roomId, uuid);
+  const player = players.getPlayer(uuid);
+
+  const response = JSON.stringify({
+    type: 'update_room',
+    data: JSON.stringify([
+      {
+        roomId,
+        roomUsers: [
+          {
+            name: player.login,
+            index: uuid,
+          },
+        ],
+      },
+    ]),
+    id: 0,
+  });
+
+  const connection = connections[uuid];
+
+  connection.send(response);
+  console.log(`Create room result: message send to client ${response}`);
+};
 
 const regNewUser = (
   data: string,
