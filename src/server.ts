@@ -2,16 +2,21 @@ import crypto from 'crypto';
 import { WebSocketServer } from 'ws';
 import { requestHandler } from './handler';
 import { httpServer } from './http_server';
-import { IConnections } from './types';
 import { Players } from './players';
+import { IConnections } from './types';
 
 const HTTP_PORT = 8181;
 const SERVER_PORT = 3000;
 const HOST = 'localhost';
 
-// const players: Record<string, IPlayer> = {};
 const players = new Players();
 const connections: IConnections = {};
+
+const handleClose = (uuid: string) => {
+  const player = players.getPlayer(uuid);
+  console.log(`Player ${player.login} is disconnected`);
+  players.removePlayer(uuid);
+};
 
 console.log(
   `Start static http server with port: ${HTTP_PORT} and host: ${HOST}`,
@@ -31,6 +36,8 @@ wss.on('connection', (connection) => {
 
     requestHandler(message.toString(), connections, uuid, players);
   });
+
+  connection.on('close', () => handleClose(uuid));
 });
 console.log(
   `Start websocket server with port: ${SERVER_PORT} and host: ${HOST}`,

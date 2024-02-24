@@ -16,6 +16,10 @@ export class Players {
     this.playersList[uuid] = player;
   }
 
+  removePlayer(uuid: string) {
+    delete this.playersList[uuid];
+  }
+
   getPlayer(uuid: string): IPlayer {
     return this.playersList[uuid];
   }
