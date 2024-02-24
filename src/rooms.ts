@@ -1,10 +1,10 @@
 import { IRoom } from './types';
 
 export class Rooms {
-  private roomsList: Record<string, IRoom> = {};
+  private roomsList: IRoom[] = [];
 
-  createRoom(roomId: string, uuid: string) {
-    this.roomsList[roomId] = { player1Id: uuid };
+  createRoom(room: IRoom) {
+    this.roomsList.push(room);
   }
 
   getRoomsList() {
