@@ -43,13 +43,14 @@ const addUserToRoom = (
   rooms.addPlayer(roomId, uuid, player);
 
   const room = rooms.getRoom(roomId);
+  const idGame = crypto.randomBytes(16).toString('hex');
 
   room?.roomUsers.forEach((user) => {
     const connection = connections[user.index];
     const startGameResponse = JSON.stringify({
       type: 'create_game',
       data: JSON.stringify({
-        idGame: 1,
+        idGame,
         idPlayer: user.index,
       }),
       id: 0,
