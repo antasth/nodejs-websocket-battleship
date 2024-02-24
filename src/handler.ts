@@ -44,11 +44,13 @@ const addUserToRoom = (
 };
 
 const broadcastAvialibleRooms = (connections: IConnections, rooms: Rooms) => {
-  const roomsList = rooms.getRoomsList();
+  const avialibleRoomsList = rooms
+    .getRoomsList()
+    .filter((room) => room.roomUsers.length < 2);
 
   const message = JSON.stringify({
     type: 'update_room',
-    data: JSON.stringify(roomsList),
+    data: JSON.stringify(avialibleRoomsList),
     id: '0',
   });
   Object.keys(connections).forEach((uuid) => {
