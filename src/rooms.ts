@@ -8,7 +8,7 @@ export class Rooms {
   }
 
   getRoom(roomId: string) {
-    return this.roomsList.filter((room) => room.roomId === roomId);
+    return this.roomsList.find((room) => room.roomId === roomId);
   }
 
   addPlayer(roomId: string, uuid: string, player: IPlayer) {

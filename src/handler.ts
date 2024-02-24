@@ -41,6 +41,21 @@ const addUserToRoom = (
   const player = players.getPlayer(uuid);
 
   rooms.addPlayer(roomId, uuid, player);
+
+  const room = rooms.getRoom(roomId);
+
+  room?.roomUsers.forEach((user) => {
+    const connection = connections[user.index];
+    const startGameResponse = JSON.stringify({
+      type: 'create_game',
+      data: JSON.stringify({
+        idGame: 1,
+        idPlayer: user.index,
+      }),
+      id: 0,
+    });
+    connection.send(startGameResponse);
+  });
 };
 
 const broadcastAvialibleRooms = (connections: IConnections, rooms: Rooms) => {
