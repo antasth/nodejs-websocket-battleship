@@ -17,13 +17,30 @@ export const requestHandler = (
       break;
 
     case 'create_room':
-      console.log('room creation');
       createRoom(uuid, connections, rooms, players);
+      break;
+
+    case 'add_user_to_room':
+      addUserToRoom(message.data, connections, rooms, players, uuid);
       break;
 
     default:
       break;
   }
+};
+
+const addUserToRoom = (
+  data: string,
+  connections: IConnections,
+  rooms: Rooms,
+  players: Players,
+  uuid: string,
+) => {
+  const message = JSON.parse(data);
+  const roomId = message.indexRoom;
+  const player = players.getPlayer(uuid);
+
+  rooms.addPlayer(roomId, uuid, player);
 };
 
 const broadcastAvialibleRooms = (connections: IConnections, rooms: Rooms) => {
