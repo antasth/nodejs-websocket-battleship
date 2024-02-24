@@ -1,22 +1,23 @@
 import { IPlayer } from './types';
 
 export class Players {
-  private playersList: IPlayer[] = [];
+  private playersList: Record<string, IPlayer> = {};
 
   playerValidation(login: string) {
-    if (this.playersList.some((player) => player.login === login)) {
-      console.log('player is found');
-      return true;
+    for (const playerId in this.playersList) {
+      if (this.playersList[playerId].login === login) {
+        return false;
+      }
     }
-    return false;
+    return true;
   }
 
-  addPlayer(player: IPlayer) {
-    this.playersList.push(player);
+  addPlayer(uuid: string, player: IPlayer) {
+    this.playersList[uuid] = player;
   }
 
-  getPlayer(login: string) {
-    return this.playersList.find((player) => player.login === login);
+  getPlayer(uuid: string): IPlayer {
+    return this.playersList[uuid];
   }
 
   getPlayersList() {

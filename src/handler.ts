@@ -1,67 +1,76 @@
-import { WebSocket } from 'ws';
 import { Players } from './players';
-import { Rooms } from './rooms';
+import { IConnections } from './types';
 
 export const requestHandler = (
   data: string,
-  ws: WebSocket,
+  connections: IConnections,
+  uuid: string,
   players: Players,
-  rooms: Rooms,
 ) => {
   const message = JSON.parse(data);
   switch (message.type) {
     case 'reg':
-      regNewUser(data, ws, players);
+      regNewUser(message.data, uuid, players, connections);
       break;
 
-    case 'create_room':
-      console.log('room creation');
-      createRoom(ws, rooms, players);
-      break;
+    // case 'create_room':
+    //   console.log('room creation');
+    //   createRoom(connection, rooms, players);
+    //   break;
 
     default:
       break;
   }
 };
 
-const regNewUser = (data: string, ws: WebSocket, players: Players): void => {
+const regNewUser = (
+  data: string,
+  uuid: string,
+  players: Players,
+  connections: IConnections,
+) => {
   const message = JSON.parse(data);
-  const messageData = JSON.parse(message.data);
-  if (!players.playerValidation(messageData.name)) {
-    players.addPlayer({
-      id: players.getPlayersList().length + 1,
-      login: messageData.name,
-      password: messageData.password,
-    });
+  console.log(message);
+
+  console.log(players.playerValidation(message.name));
+
+  if (players.playerValidation(message.name)) {
+    const player = {
+      login: message.name,
+      password: message.password,
+    };
+
+    players.addPlayer(uuid, player);
   } else {
     console.log(
-      `Validation error: Player with name ${messageData.name} already registered`,
+      `Validation error: Player with name "${message.name}" already registered`,
     );
     return;
   }
-
-  const player = players.getPlayer(messageData.name);
+  const player = players.getPlayer(uuid);
 
   const response = JSON.stringify({
     type: 'reg',
-    data: `{"name":"${player?.login}","index":${player?.id},"error":false}`,
+    data: `{"name":"${player?.login}","index":"${uuid}","error":false}`,
     id: 0,
   });
 
-  ws.send(response);
+  const connection = connections[uuid];
+  connection.send(response);
   console.log(`Registration result: message send to client ${response}`);
+  console.log('players', players);
 };
 
-const createRoom = (ws: WebSocket, rooms: Rooms, players: Players) => {
-  const roomIndex = rooms.getRoomsList().length + 1;
-  rooms.addRoom({ indexRoom: roomIndex });
+// const createRoom = (connection: WebSocket, rooms: Rooms, players: Players) => {
+//   const roomIndex = rooms.getRoomsList().length + 1;
+//   rooms.addRoom({ indexRoom: roomIndex });
 
-  const player = players.getPlayersList()[0];
-  const response = JSON.stringify({
-    type: 'update_room',
-    data: `[{"roomId":${roomIndex},"roomUsers":[{"name":"${player.login}","index":0}]}]`,
-    id: 0,
-  });
-  ws.send(response);
-  console.log(`Create room result: message send to client ${response}`);
-};
+//   const player = players.getPlayersList()[0];
+//   const response = JSON.stringify({
+//     type: 'update_room',
+//     data: `[{"roomId":${roomIndex},"roomUsers":[{"name":"${player.login}","index":0}]}]`,
+//     id: 0,
+//   });
+//   connection.send(response);
+//   console.log(`Create room result: message send to client ${response}`);
+// };
