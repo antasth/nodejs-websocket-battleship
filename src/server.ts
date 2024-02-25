@@ -3,8 +3,9 @@ import { WebSocketServer } from 'ws';
 import { requestHandler } from './handler';
 import { httpServer } from './http_server';
 import { Players } from './players';
-import { IConnections } from './types';
 import { Rooms } from './rooms';
+import { IConnections } from './types';
+import { Games } from './games';
 
 const HTTP_PORT = 8181;
 const SERVER_PORT = 3000;
@@ -12,6 +13,7 @@ const HOST = 'localhost';
 
 const players = new Players();
 const rooms = new Rooms();
+const games = new Games();
 const connections: IConnections = {};
 
 const handleClose = (uuid: string) => {
@@ -36,7 +38,14 @@ wss.on('connection', (connection) => {
 
     connections[uuid] = connection;
 
-    requestHandler(message.toString(), connections, uuid, players, rooms);
+    requestHandler(
+      message.toString(),
+      connections,
+      uuid,
+      players,
+      rooms,
+      games,
+    );
   });
 
   connection.on('close', () => handleClose(uuid));

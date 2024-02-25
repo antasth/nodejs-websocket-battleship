@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { Games } from './games';
 import { Players } from './players';
 import { Rooms } from './rooms';
 import { IConnections } from './types';
@@ -9,6 +10,7 @@ export const requestHandler = (
   uuid: string,
   players: Players,
   rooms: Rooms,
+  games: Games,
 ) => {
   const message = JSON.parse(data);
   switch (message.type) {
@@ -21,7 +23,11 @@ export const requestHandler = (
       break;
 
     case 'add_user_to_room':
-      addUserToRoom(message.data, connections, rooms, players, uuid);
+      addUserToRoom(message.data, connections, rooms, players, games, uuid);
+      break;
+
+    case 'add_ships':
+      addPlayerShipsToGame(message.data, games);
       break;
 
     default:
@@ -29,11 +35,26 @@ export const requestHandler = (
   }
 };
 
+const addPlayerShipsToGame = (
+  data: string,
+  games: Games,
+  // connections: IConnections,
+  // rooms: Rooms,
+  // players: Players,
+  // uuid: string,
+) => {
+  const message = JSON.parse(data);
+  console.log('message', message);
+  const { gameId, ships, indexPlayer } = message;
+  games.addPlayerToGame(gameId, ships, indexPlayer);
+};
+
 const addUserToRoom = (
   data: string,
   connections: IConnections,
   rooms: Rooms,
   players: Players,
+  games: Games,
   uuid: string,
 ) => {
   const message = JSON.parse(data);
@@ -44,6 +65,7 @@ const addUserToRoom = (
 
   const room = rooms.getRoom(roomId);
   const idGame = crypto.randomBytes(16).toString('hex');
+  games.createGame(idGame);
 
   room?.roomUsers.forEach((user) => {
     const connection = connections[user.index];
@@ -75,6 +97,9 @@ const broadcastAvialibleRooms = (connections: IConnections, rooms: Rooms) => {
   });
 };
 
+// const broadcastStartedGames = (connections: IConnections, games: Games) => {
+
+// }
 const createRoom = (
   uuid: string,
   connections: IConnections,

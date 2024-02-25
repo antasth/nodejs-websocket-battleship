@@ -18,3 +18,25 @@ export interface IRoomUser {
 export interface IConnections {
   [uuid: string]: WebSocket;
 }
+
+export interface IGame {
+  gameId: string;
+  players?: IPlayers[];
+}
+
+export interface IPlayers {
+  uuid: string;
+  ships: IShips;
+}
+
+export interface IShips {
+  position: IShipPosition;
+  direction: boolean;
+  type: string;
+  length: number;
+}
+
+export interface IShipPosition {
+  x: number;
+  y: number;
+}
