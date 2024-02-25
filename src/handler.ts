@@ -102,10 +102,10 @@ const broadcastStartedGames = (connections: IConnections, games: Games) => {
 
   if (gamesToStart.length) {
     gamesToStart.forEach((game) => {
-      game.players?.forEach((player) => {
+      game.players?.forEach((player, i) => {
         const connection = connections[player.uuid];
 
-        const message = JSON.stringify({
+        const startMessage = JSON.stringify({
           type: 'start_game',
           data: JSON.stringify({
             ships: player.ships,
@@ -114,11 +114,28 @@ const broadcastStartedGames = (connections: IConnections, games: Games) => {
           id: 0,
         });
 
-        connection.send(message);
+        if (i === 0) {
+          sendNowYourTurnMessage(connections, player.uuid);
+        }
+
+        connection.send(startMessage);
       });
     });
     console.log(`Game start result: messages start_game send to clients`);
   }
+};
+
+const sendNowYourTurnMessage = (connections: IConnections, uuid: string) => {
+  const connection = connections[uuid];
+
+  const turnMessage = JSON.stringify({
+    type: 'turn',
+    data: JSON.stringify({
+      currentPlayer: uuid,
+    }),
+    id: 0,
+  });
+  connection.send(turnMessage);
 };
 
 const createRoom = (
