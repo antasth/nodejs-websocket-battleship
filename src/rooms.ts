@@ -20,7 +20,6 @@ export class Rooms {
     };
 
     this.roomsList[index].roomUsers.push(newPlayer);
-    console.log(this.roomsList);
   }
 
   getRoomsList() {

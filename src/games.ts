@@ -16,7 +16,9 @@ export class Games {
         ships,
       });
     }
+  }
 
-    console.log('this.gamesList', this.gamesList);
+  getGames() {
+    return this.gamesList;
   }
 }

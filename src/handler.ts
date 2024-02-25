@@ -27,7 +27,7 @@ export const requestHandler = (
       break;
 
     case 'add_ships':
-      addPlayerShipsToGame(message.data, games);
+      addPlayerShipsToGame(message.data, games, connections);
       break;
 
     default:
@@ -38,15 +38,13 @@ export const requestHandler = (
 const addPlayerShipsToGame = (
   data: string,
   games: Games,
-  // connections: IConnections,
-  // rooms: Rooms,
-  // players: Players,
-  // uuid: string,
+  connections: IConnections,
 ) => {
   const message = JSON.parse(data);
   console.log('message', message);
   const { gameId, ships, indexPlayer } = message;
   games.addPlayerToGame(gameId, ships, indexPlayer);
+  broadcastStartedGames(connections, games);
 };
 
 const addUserToRoom = (
@@ -97,9 +95,32 @@ const broadcastAvialibleRooms = (connections: IConnections, rooms: Rooms) => {
   });
 };
 
-// const broadcastStartedGames = (connections: IConnections, games: Games) => {
+const broadcastStartedGames = (connections: IConnections, games: Games) => {
+  const gamesToStart = games
+    .getGames()
+    .filter((game) => game.players?.length === 2);
 
-// }
+  if (gamesToStart.length) {
+    gamesToStart.forEach((game) => {
+      game.players?.forEach((player) => {
+        const connection = connections[player.uuid];
+
+        const message = JSON.stringify({
+          type: 'start_game',
+          data: JSON.stringify({
+            ships: player.ships,
+            currentPlayerIndex: player.uuid,
+          }),
+          id: 0,
+        });
+
+        connection.send(message);
+      });
+    });
+    console.log(`Game start result: messages start_game send to clients`);
+  }
+};
+
 const createRoom = (
   uuid: string,
   connections: IConnections,
@@ -151,9 +172,6 @@ const regNewUser = (
   rooms: Rooms,
 ) => {
   const message = JSON.parse(data);
-  console.log(message);
-
-  console.log(players.playerValidation(message.name));
 
   if (players.playerValidation(message.name)) {
     const player = {
@@ -180,5 +198,4 @@ const regNewUser = (
   connection.send(response);
   broadcastAvialibleRooms(connections, rooms);
   console.log(`Registration result: message send to client ${response}`);
-  console.log('players', players);
 };
