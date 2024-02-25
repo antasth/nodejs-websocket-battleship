@@ -7,7 +7,7 @@ export class Games {
     this.gamesList.push({ gameId, players: [] });
   }
 
-  addPlayerToGame(gameId: string, ships: IShips, indexPlayer: string) {
+  addPlayerToGame(gameId: string, ships: IShips[], indexPlayer: string) {
     const game = this.gamesList.find((game) => game.gameId === gameId);
 
     if (game?.players) {

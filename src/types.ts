@@ -26,7 +26,7 @@ export interface IGame {
 
 export interface IPlayers {
   uuid: string;
-  ships: IShips;
+  ships: IShips[];
 }
 
 export interface IShips {
