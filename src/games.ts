@@ -18,6 +18,10 @@ export class Games {
     }
   }
 
+  getGame(gameId: string) {
+    return this.gamesList.find((game) => game.gameId === gameId);
+  }
+
   getGames() {
     return this.gamesList;
   }

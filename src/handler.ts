@@ -30,8 +30,24 @@ export const requestHandler = (
       addPlayerShipsToGame(message.data, games, connections);
       break;
 
+    case 'attack':
+      attackOtherPlayer(message.data, games);
+      break;
+
     default:
       break;
+  }
+};
+
+const attackOtherPlayer = (data: string, games: Games) => {
+  const message = JSON.parse(data);
+  const { gameId, indexPlayer } = message;
+  const game = games.getGame(gameId);
+
+  console.log('indexPlayer', indexPlayer);
+
+  if (game?.players) {
+    console.log('game', game?.players[0].ships);
   }
 };
 
