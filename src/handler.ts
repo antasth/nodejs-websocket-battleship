@@ -69,10 +69,26 @@ const attackOtherPlayer = (
     });
     playerToAttack.shipsMatrix[y][x] = 0;
 
-    console.log('playerToAttack.shipsMatrix', playerToAttack.shipsMatrix);
-
     const connection = connections[indexPlayer];
     connection.send(shotResponse);
+
+    const winner = games.foundGameWinner(gameId, playerToAttack.uuid);
+
+    if (winner) {
+      const finishGameResponse = JSON.stringify({
+        type: 'finish',
+        data: JSON.stringify({
+          winPlayer: winner,
+        }),
+        id: 0,
+      });
+
+      game?.players?.forEach((player) => {
+        const connection = connections[player.uuid];
+
+        connection.send(finishGameResponse);
+      });
+    }
     sendNowYourTurnMessage(connections, attackerId);
   } else if (attacker?.turn && playerToAttack?.shipsMatrix[y][x] === 0) {
     games.changePlayersTurn(gameId);
