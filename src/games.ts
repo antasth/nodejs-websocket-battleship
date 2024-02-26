@@ -48,6 +48,14 @@ export class Games {
     }
   }
 
+  removeGame(gameId: string) {
+    const gameIndex = this.gamesList.findIndex(
+      (game) => game.gameId === gameId,
+    );
+
+    this.gamesList.splice(gameIndex, 1);
+  }
+
   getGame(gameId: string) {
     return this.gamesList.find((game) => game.gameId === gameId);
   }

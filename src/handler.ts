@@ -31,7 +31,7 @@ export const requestHandler = (
       break;
 
     case 'attack':
-      attackOtherPlayer(message.data, games, connections);
+      attackOtherPlayer(message.data, games, rooms, connections);
       break;
 
     default:
@@ -42,6 +42,7 @@ export const requestHandler = (
 const attackOtherPlayer = (
   data: string,
   games: Games,
+  rooms: Rooms,
   connections: IConnections,
 ) => {
   const message = JSON.parse(data);
@@ -87,6 +88,8 @@ const attackOtherPlayer = (
         const connection = connections[player.uuid];
 
         connection.send(finishGameResponse);
+        games.removeGame(gameId);
+        broadcastAvialibleRooms(connections, rooms);
       });
     }
     sendNowYourTurnMessage(connections, attackerId);
