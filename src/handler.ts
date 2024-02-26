@@ -31,7 +31,7 @@ export const requestHandler = (
       break;
 
     case 'attack':
-      attackOtherPlayer(message.data, games);
+      attackOtherPlayer(message.data, games, connections);
       break;
 
     default:
@@ -39,12 +39,58 @@ export const requestHandler = (
   }
 };
 
-const attackOtherPlayer = (data: string, games: Games) => {
+const attackOtherPlayer = (
+  data: string,
+  games: Games,
+  connections: IConnections,
+) => {
   const message = JSON.parse(data);
-  const { gameId, indexPlayer } = message;
+  const { x, y, gameId, indexPlayer } = message;
   const game = games.getGame(gameId);
 
-  console.log('indexPlayer', indexPlayer);
+  const attackerId = indexPlayer;
+  const attacker = game?.players?.find((player) => player.uuid === attackerId);
+  const playerToAttack = game?.players?.find(
+    (player) => player.uuid !== indexPlayer,
+  );
+  console.log('attacker.turn', attacker?.turn);
+  console.log('playerToAttack.turn', playerToAttack?.turn);
+
+  console.log('playerToAttack?.shipsMatrix', playerToAttack?.shipsMatrix);
+  if (attacker?.turn && playerToAttack?.shipsMatrix[y][x] === 1) {
+    const shotResponse = JSON.stringify({
+      type: 'attack',
+      data: JSON.stringify({
+        position: {
+          x,
+          y,
+        },
+        currentPlayer: indexPlayer,
+        status: 'shot',
+      }),
+      id: 0,
+    });
+    const connection = connections[indexPlayer];
+    connection.send(shotResponse);
+    sendNowYourTurnMessage(connections, attackerId);
+  } else if (attacker?.turn && playerToAttack?.shipsMatrix[y][x] === 0) {
+    const missResponse = JSON.stringify({
+      type: 'attack',
+      data: JSON.stringify({
+        position: {
+          x,
+          y,
+        },
+        currentPlayer: indexPlayer,
+        status: 'miss',
+      }),
+      id: 0,
+    });
+    const connection = connections[indexPlayer];
+    connection.send(missResponse);
+    sendNowYourTurnMessage(connections, playerToAttack.uuid);
+  }
+  // console.log('playerToAttack', playerToAttack);
 
   if (game?.players) {
     console.log('game', game?.players[0].ships);
@@ -59,7 +105,8 @@ const addPlayerShipsToGame = (
   const message = JSON.parse(data);
   console.log('message', message);
   const { gameId, ships, indexPlayer } = message;
-  games.addPlayerToGame(gameId, ships, indexPlayer);
+  const turn = games.getGame(gameId)?.players?.length === 1;
+  games.addPlayerToGame(gameId, ships, indexPlayer, turn);
   broadcastStartedGames(connections, games);
 };
 
