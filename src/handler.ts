@@ -53,10 +53,7 @@ const attackOtherPlayer = (
   const playerToAttack = game?.players?.find(
     (player) => player.uuid !== indexPlayer,
   );
-  console.log('attacker.turn', attacker?.turn);
-  console.log('playerToAttack.turn', playerToAttack?.turn);
 
-  console.log('playerToAttack?.shipsMatrix', playerToAttack?.shipsMatrix);
   if (attacker?.turn && playerToAttack?.shipsMatrix[y][x] === 1) {
     const shotResponse = JSON.stringify({
       type: 'attack',
@@ -74,6 +71,7 @@ const attackOtherPlayer = (
     connection.send(shotResponse);
     sendNowYourTurnMessage(connections, attackerId);
   } else if (attacker?.turn && playerToAttack?.shipsMatrix[y][x] === 0) {
+    games.changePlayersTurn(gameId);
     const missResponse = JSON.stringify({
       type: 'attack',
       data: JSON.stringify({
@@ -90,11 +88,6 @@ const attackOtherPlayer = (
     connection.send(missResponse);
     sendNowYourTurnMessage(connections, playerToAttack.uuid);
   }
-  // console.log('playerToAttack', playerToAttack);
-
-  if (game?.players) {
-    console.log('game', game?.players[0].ships);
-  }
 };
 
 const addPlayerShipsToGame = (
@@ -103,9 +96,8 @@ const addPlayerShipsToGame = (
   connections: IConnections,
 ) => {
   const message = JSON.parse(data);
-  console.log('message', message);
   const { gameId, ships, indexPlayer } = message;
-  const turn = games.getGame(gameId)?.players?.length === 1;
+  const turn = games.getGame(gameId)?.players?.length === 0;
   games.addPlayerToGame(gameId, ships, indexPlayer, turn);
   broadcastStartedGames(connections, games);
 };

@@ -8,6 +8,12 @@ export class Games {
     this.gamesList.push({ gameId, players: [] });
   }
 
+  changePlayersTurn(gameId: string) {
+    this.gamesList
+      .find((game) => game.gameId === gameId)
+      ?.players?.forEach((player) => (player.turn = !player.turn));
+  }
+
   addPlayerToGame(
     gameId: string,
     ships: IShips[],
@@ -25,8 +31,6 @@ export class Games {
         shipsMatrix,
       });
     }
-
-    console.log(shipsMatrix);
   }
 
   getGame(gameId: string) {

@@ -12,7 +12,6 @@ export const createShipsMatrix = (ships: IShips[]) => {
       }
     } else {
       for (let i = x; i < x + ship.length; i++) {
-        //01
         matrix[y][i] = 1;
       }
     }
