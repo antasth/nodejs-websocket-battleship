@@ -67,6 +67,10 @@ const attackOtherPlayer = (
       }),
       id: 0,
     });
+    playerToAttack.shipsMatrix[y][x] = 0;
+
+    console.log('playerToAttack.shipsMatrix', playerToAttack.shipsMatrix);
+
     const connection = connections[indexPlayer];
     connection.send(shotResponse);
     sendNowYourTurnMessage(connections, attackerId);
